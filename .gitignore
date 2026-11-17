@@ -1,0 +1,18 @@
+# Local input images and archived experiments
+images/
+old_files/
+
+# CMake build directories and generated files
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Locally built Windows binaries and compiler artefacts
+*.exe
+*.obj
+*.pdb
+*.ilk
