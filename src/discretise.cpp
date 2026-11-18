@@ -11,7 +11,7 @@
 namespace image_processor {
 
 namespace {
-  constexpr double yWeight{4.0}, cWeight{1.0};
+  constexpr double yWeight{1.15}, cWeight{1.0};
   constexpr double tol{0.01}; // maximum weighted squared movement
   constexpr std::size_t maxIter{50};
 }
@@ -74,7 +74,7 @@ std::vector<std::size_t> chooseInitial(std::size_t n, std::size_t k) {
 
 void kmeans(Image& image, std::size_t k) {
   std::vector<Centroid> centres(k);
-  std::size_t imageSize = image.width() * image.height();
+  std::size_t imageSize = image.size();
   std::vector<std::size_t> initial{chooseInitial(imageSize, k)};
 
   for (std::size_t i{0}; i < k; ++i) {

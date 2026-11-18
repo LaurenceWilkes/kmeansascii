@@ -10,10 +10,9 @@
 namespace image_processor {
 
 namespace {
-  constexpr std::array<int, 15> hs {
-      11, 13, 15, 17, 19,
-      30, 32, 34, 36, 38,
-      45, 47, 51, 68, 83,
+  constexpr std::array<int, 18> hs {
+      7, 9, 10, 11, 13, 15, 17, 19, 30,
+      32, 34, 36, 38, 45, 47, 51, 68, 83,
   };
 
   constexpr int widthForHeight(int height) {
@@ -42,21 +41,15 @@ Image reduce(const Image& fullImage, int gHeight) {
 
   Image reducedImage(reducedWidth, reducedHeight);
 
-  int gSize = gWidth * gHeight;
-
   for (std::size_t i{0}; i < reducedWidth; ++i) {
     for (std::size_t j{0}; j < reducedHeight; ++j) {
-      double ySum{0.0}, cbSum{0.0}, crSum{0.0};
-      for (std::size_t ii{gWidth * i}; ii < gWidth * (i + 1); ++ii) {
-        for (std::size_t jj{gHeight * j}; jj < gHeight * (j + 1); ++jj) {
-          ySum += fullImage.yAt(ii, jj);
-          cbSum += fullImage.cbAt(ii, jj);
-          crSum += fullImage.crAt(ii, jj);
-        }
-      }
-      reducedImage.yAt(i, j)  = d2uc(ySum / gSize);
-      reducedImage.cbAt(i, j) = d2uc(cbSum / gSize);
-      reducedImage.crAt(i, j) = d2uc(crSum / gSize);
+      Colour ac{fullImage.averageColour(
+          gWidth * i, gWidth * (i + 1),
+          gHeight * j, gHeight * (j + 1)
+      )};
+      reducedImage.yAt(i, j)  = ac.y;
+      reducedImage.cbAt(i, j) = ac.cb;
+      reducedImage.crAt(i, j) = ac.cr;
     }
   }
 

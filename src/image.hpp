@@ -19,6 +19,16 @@ struct Colour {
   unsigned char y;
   unsigned char cb;
   unsigned char cr;
+
+  Colour toRgb() const {
+    const double tcb = static_cast<double>(cb) - 128.0;
+    const double tcr = static_cast<double>(cr) - 128.0;
+    return Colour{
+      d2uc(y + 1.402 * tcr),
+      d2uc(y - 0.344136 * tcb - 0.714136 * tcr),
+      d2uc(y + 1.772 * tcb)
+    };
+  }
 }; // Colour
 
 class Image {
@@ -45,6 +55,10 @@ class Image {
 
     std::size_t height() const {
       return height_;
+    }
+
+    std::size_t size() const {
+      return width_ * height_;
     }
 
     unsigned char& yAt(std::size_t x, std::size_t y) {
@@ -108,6 +122,27 @@ class Image {
       image_data_.get()[3 * loc + 1] = colour.cb;
       image_data_.get()[3 * loc + 2] = colour.cr;
     } // setColour
+
+    Colour averageColour(std::size_t xl, std::size_t xu, std::size_t yl, std::size_t yu) const {
+#ifdef DEBUG_MODE
+      if (xl >= xu || xu > width_ || yl >= yu || yu > height_) 
+        throw std::out_of_range("Indices not in range");
+#endif
+      double ySum{0.0}, cbSum{0.0}, crSum{0.0};
+      for (std::size_t y{yl}; y < yu; ++y) {
+        for (std::size_t x{xl}; x < xu; ++x) {
+          ySum  += yAt(x, y);
+          cbSum += cbAt(x, y);
+          crSum += crAt(x, y);
+        }
+      }
+      double rangeSize{static_cast<double>((xu - xl) * (yu - yl))};
+      return Colour{
+        d2uc(ySum / rangeSize),
+        d2uc(cbSum / rangeSize),
+        d2uc(crSum / rangeSize)
+      };
+    }
 
   private:
     std::size_t width_;

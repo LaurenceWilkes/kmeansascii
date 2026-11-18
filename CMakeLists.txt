@@ -16,6 +16,7 @@ add_executable(fontPic
     src/reduce.cpp
     src/discretise.cpp
     src/display.cpp
+    src/html.cpp
 )
 
 # Keep the language version and include paths local to this executable.
