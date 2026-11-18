@@ -8,79 +8,74 @@
 #include <vector>
 
 #include "display.hpp"
+#include "image.hpp"
 
 namespace image_processor {
+
 namespace {
+  constexpr wchar_t kWindowClassName[] = L"fontPicImageDisplay";
 
-constexpr wchar_t kWindowClassName[] = L"fontPicImageDisplay";
+  struct DisplayData {
+    int width;
+    int height;
+    std::vector<unsigned char> pixels;
+  };
 
-struct DisplayData {
-  int width;
-  int height;
-  std::vector<unsigned char> pixels;
-};
-
-unsigned char toByte(double value) {
-  return static_cast<unsigned char>(
-      std::clamp(std::lround(value), 0L, 255L));
-}
-
-LRESULT CALLBACK windowProc(HWND window, UINT message,
-                            WPARAM wparam, LPARAM lparam) {
-  if (message == WM_NCCREATE) {
-    const auto* create = reinterpret_cast<const CREATESTRUCTW*>(lparam);
-    SetWindowLongPtrW(window, GWLP_USERDATA,
-                      reinterpret_cast<LONG_PTR>(create->lpCreateParams));
-  }
-
-  auto* data = reinterpret_cast<DisplayData*>(
-      GetWindowLongPtrW(window, GWLP_USERDATA));
-
-  switch (message) {
-    case WM_PAINT: {
-      PAINTSTRUCT paint{};
-      HDC device = BeginPaint(window, &paint);
-
-      if (data != nullptr) {
-        BITMAPINFO bitmap{};
-        bitmap.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        bitmap.bmiHeader.biWidth = data->width;
-        bitmap.bmiHeader.biHeight = -data->height; // top-down rows
-        bitmap.bmiHeader.biPlanes = 1;
-        bitmap.bmiHeader.biBitCount = 24;
-        bitmap.bmiHeader.biCompression = BI_RGB;
-
-        SetDIBitsToDevice(device, 0, 0, data->width, data->height,
-                           0, 0, 0, data->height, data->pixels.data(),
-                           &bitmap, DIB_RGB_COLORS);
-      }
-
-      EndPaint(window, &paint);
-      return 0;
+  LRESULT CALLBACK windowProc(HWND window, UINT message,
+                              WPARAM wparam, LPARAM lparam) {
+    if (message == WM_NCCREATE) {
+      const auto* create = reinterpret_cast<const CREATESTRUCTW*>(lparam);
+      SetWindowLongPtrW(window, GWLP_USERDATA,
+                        reinterpret_cast<LONG_PTR>(create->lpCreateParams));
     }
 
-    case WM_DESTROY:
-      PostQuitMessage(0);
-      return 0;
+    auto* data = reinterpret_cast<DisplayData*>(
+        GetWindowLongPtrW(window, GWLP_USERDATA));
 
-    default:
-      return DefWindowProcW(window, message, wparam, lparam);
+    switch (message) {
+      case WM_PAINT: {
+        PAINTSTRUCT paint{};
+        HDC device = BeginPaint(window, &paint);
+
+        if (data != nullptr) {
+          BITMAPINFO bitmap{};
+          bitmap.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+          bitmap.bmiHeader.biWidth = data->width;
+          bitmap.bmiHeader.biHeight = -data->height; // top-down rows
+          bitmap.bmiHeader.biPlanes = 1;
+          bitmap.bmiHeader.biBitCount = 24;
+          bitmap.bmiHeader.biCompression = BI_RGB;
+
+          SetDIBitsToDevice(device, 0, 0, data->width, data->height,
+                             0, 0, 0, data->height, data->pixels.data(),
+                             &bitmap, DIB_RGB_COLORS);
+        }
+
+        EndPaint(window, &paint);
+        return 0;
+      }
+
+      case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+
+      default:
+        return DefWindowProcW(window, message, wparam, lparam);
+    }
   }
-}
 
-void registerWindowClass() {
-  WNDCLASSW windowClass{};
-  windowClass.lpfnWndProc = windowProc;
-  windowClass.hInstance = GetModuleHandleW(nullptr);
-  windowClass.hCursor = LoadCursorW(nullptr, MAKEINTRESOURCEW(32512));
-  windowClass.lpszClassName = kWindowClassName;
+  void registerWindowClass() {
+    WNDCLASSW windowClass{};
+    windowClass.lpfnWndProc = windowProc;
+    windowClass.hInstance = GetModuleHandleW(nullptr);
+    windowClass.hCursor = LoadCursorW(nullptr, MAKEINTRESOURCEW(32512));
+    windowClass.lpszClassName = kWindowClassName;
 
-  if (RegisterClassW(&windowClass) == 0 &&
-      GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
-    throw std::runtime_error("Could not register display window");
+    if (RegisterClassW(&windowClass) == 0 &&
+        GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+      throw std::runtime_error("Could not register display window");
+    }
   }
-}
-
 } // namespace
 
 void display(const Image& image) {
@@ -104,9 +99,9 @@ void display(const Image& image) {
     const std::size_t column = i % image.width();
     unsigned char* pixel = data.pixels.data() + row * rowBytes + column * 3;
 
-    pixel[0] = toByte(colour.y + 1.772 * cb);                 // B
-    pixel[1] = toByte(colour.y - 0.344136 * cb - 0.714136 * cr); // G
-    pixel[2] = toByte(colour.y + 1.402 * cr);                 // R
+    pixel[0] = d2uc(colour.y + 1.772 * cb);                    // B
+    pixel[1] = d2uc(colour.y - 0.344136 * cb - 0.714136 * cr); // G
+    pixel[2] = d2uc(colour.y + 1.402 * cr);                    // R
   }
 
   registerWindowClass();
@@ -120,9 +115,8 @@ void display(const Image& image) {
       client.bottom - client.top, nullptr, nullptr, GetModuleHandleW(nullptr),
       &data);
 
-  if (window == nullptr) {
+  if (window == nullptr)
     throw std::runtime_error("Could not create display window");
-  }
 
   MSG message{};
   while (GetMessageW(&message, nullptr, 0, 0) > 0) {
