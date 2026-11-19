@@ -32,7 +32,7 @@ namespace {
   }
 } // namespace
 
-void writeHtml(const Image& image, const std::filesystem::path& outputFile) {
+void writeHtml(const Image& image, const std::filesystem::path& outputFile, bool blackBackground) {
   const std::size_t imageSize = image.size();
   std::unordered_map<std::uint32_t, std::size_t> colourClasses;
   std::vector<Colour> colours;
@@ -51,10 +51,10 @@ void writeHtml(const Image& image, const std::filesystem::path& outputFile) {
     throw std::runtime_error("Could not open HTML output file");
   }
 
-  Colour background{image.averageColour(0, image.width(), 0, image.height()).toRgb()};
+  Colour background{0, 0, 0};
+  if (!blackBackground) background = image.averageColour(0, image.width(), 0, image.height()).toRgb();
   constexpr double characterWidthInEm = 0.6;
-  const double fontSizeFromWidth =
-      100.0 / (characterWidthInEm * static_cast<double>(image.width()));
+  const double fontSizeFromWidth = 100.0 / (characterWidthInEm * static_cast<double>(image.width()));
   const double fontSizeFromHeight = 100.0 / static_cast<double>(image.height());
 
   output << "<!doctype html>\n"

@@ -1,6 +1,7 @@
 # Local input images and archived experiments
 images/
 old_files/
+html/
 
 # CMake build directories and generated files
 build/

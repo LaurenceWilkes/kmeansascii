@@ -31,6 +31,12 @@ struct Colour {
   }
 }; // Colour
 
+/*
+  This holds the image data in a pixel buffer similar to the one used by 
+  stb_image. The values for each pixel are stored in the YCbCr format and 
+  can be accessed as a colour with colourAt or individually with yAt, cbAt, 
+  and crAt.
+*/
 class Image {
   public: 
     using PixelBuffer = std::unique_ptr<unsigned char, void (*)(void*)>;
@@ -123,6 +129,7 @@ class Image {
       image_data_.get()[3 * loc + 2] = colour.cr;
     } // setColour
 
+    // Returns the colour in the region which is closest to the average.
     Colour averageColour(std::size_t xl, std::size_t xu, std::size_t yl, std::size_t yu) const {
 #ifdef DEBUG_MODE
       if (xl >= xu || xu > width_ || yl >= yu || yu > height_) 
@@ -137,11 +144,28 @@ class Image {
         }
       }
       double rangeSize{static_cast<double>((xu - xl) * (yu - yl))};
-      return Colour{
+      Colour avgColour{
         d2uc(ySum / rangeSize),
         d2uc(cbSum / rangeSize),
         d2uc(crSum / rangeSize)
       };
+      int minDist{195075}; // 3 * 255 * 255
+      unsigned char ay{avgColour.y}, acb{avgColour.cb}, acr{avgColour.cr};
+      for (std::size_t y{yl}; y < yu; ++y) {
+        for (std::size_t x{xl}; x < xu; ++x) {
+          int dy{(int) avgColour.y - yAt(x, y)};
+          int dcb{(int) avgColour.cb - cbAt(x, y)};
+          int dcr{(int) avgColour.cr - crAt(x, y)};
+          int d = dy * dy + dcb * dcb + dcr * dcr;  
+          if (d < minDist) {
+            minDist = d;
+            ay = yAt(x, y);
+            acb = cbAt(x, y);
+            acr = crAt(x, y);
+          }
+        }
+      }
+      return Colour{ay, acb, acr};
     }
 
   private:
