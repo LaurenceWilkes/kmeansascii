@@ -17,6 +17,7 @@ add_executable(kmeansascii
     src/discretise.cpp
     src/display.cpp
     src/html.cpp
+    src/toPng.cpp
 )
 
 # Keep the language version and include paths local to this executable.
