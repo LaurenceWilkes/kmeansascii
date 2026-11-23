@@ -42,11 +42,11 @@ class Image {
     using PixelBuffer = std::unique_ptr<unsigned char, void (*)(void*)>;
 
     Image(std::size_t w, std::size_t h, PixelBuffer image_data) 
-        : width_(w), height_(h), image_data_(std::move(image_data)) {}
+      : width_(w), height_(h), image_data_(std::move(image_data)) {}
 
     Image(std::size_t w, std::size_t h) : Image(w, h, PixelBuffer{
-            static_cast<unsigned char*>(std::malloc(w * h * 3)), 
-            std::free 
+      static_cast<unsigned char*>(std::malloc(w * h * 3)), 
+      std::free 
     }) {
       if (w == 0 || h == 0)
         throw std::out_of_range("Image dimensions must be non-zero");
@@ -69,49 +69,56 @@ class Image {
 
     unsigned char& yAt(std::size_t x, std::size_t y) {
 #ifdef DEBUG_MODE
-      if (x >= width_ || y >= height_) throw std::out_of_range("Coordinates not in range");
+      if (x >= width_ || y >= height_) 
+        throw std::out_of_range("Coordinates not in range");
 #endif
       return image_data_.get()[3 * (y * width_ + x)];
     }
 
     const unsigned char& yAt(std::size_t x, std::size_t y) const {
 #ifdef DEBUG_MODE
-      if (x >= width_ || y >= height_) throw std::out_of_range("Coordinates not in range");
+      if (x >= width_ || y >= height_) 
+        throw std::out_of_range("Coordinates not in range");
 #endif
       return image_data_.get()[3 * (y * width_ + x)];
     }
 
     unsigned char& cbAt(std::size_t x, std::size_t y) {
 #ifdef DEBUG_MODE
-      if (x >= width_ || y >= height_) throw std::out_of_range("Coordinates not in range");
+      if (x >= width_ || y >= height_) 
+        throw std::out_of_range("Coordinates not in range");
 #endif
       return image_data_.get()[3 * (y * width_ + x) + 1];
     }
 
     const unsigned char& cbAt(std::size_t x, std::size_t y) const {
 #ifdef DEBUG_MODE
-      if (x >= width_ || y >= height_) throw std::out_of_range("Coordinates not in range");
+      if (x >= width_ || y >= height_) 
+        throw std::out_of_range("Coordinates not in range");
 #endif
       return image_data_.get()[3 * (y * width_ + x) + 1];
     }
 
     unsigned char& crAt(std::size_t x, std::size_t y) {
 #ifdef DEBUG_MODE
-      if (x >= width_ || y >= height_) throw std::out_of_range("Coordinates not in range");
+      if (x >= width_ || y >= height_) 
+        throw std::out_of_range("Coordinates not in range");
 #endif
       return image_data_.get()[3 * (y * width_ + x) + 2];
     }
 
     const unsigned char& crAt(std::size_t x, std::size_t y) const {
 #ifdef DEBUG_MODE
-      if (x >= width_ || y >= height_) throw std::out_of_range("Coordinates not in range");
+      if (x >= width_ || y >= height_) 
+        throw std::out_of_range("Coordinates not in range");
 #endif
       return image_data_.get()[3 * (y * width_ + x) + 2];
     }
 
     Colour colourAt(std::size_t loc) const {
 #ifdef DEBUG_MODE
-      if (loc >= width_ * height_) throw std::out_of_range("Location not in range");
+      if (loc >= width_ * height_) 
+        throw std::out_of_range("Location not in range");
 #endif
       return Colour{
         image_data_.get()[3 * loc],
@@ -122,7 +129,8 @@ class Image {
 
     void setColour(const Colour& colour, std::size_t loc) {
 #ifdef DEBUG_MODE
-      if (loc >= width_ * height_) throw std::out_of_range("Location not in range");
+      if (loc >= width_ * height_) 
+        throw std::out_of_range("Location not in range");
 #endif
       image_data_.get()[3 * loc] = colour.y;
       image_data_.get()[3 * loc + 1] = colour.cb;
@@ -130,7 +138,8 @@ class Image {
     } // setColour
 
     // Returns the colour in the region which is closest to the average.
-    Colour averageColour(std::size_t xl, std::size_t xu, std::size_t yl, std::size_t yu) const {
+    Colour averageColour(std::size_t xl, std::size_t xu, 
+                         std::size_t yl, std::size_t yu) const {
 #ifdef DEBUG_MODE
       if (xl >= xu || xu > width_ || yl >= yu || yu > height_) 
         throw std::out_of_range("Indices not in range");
