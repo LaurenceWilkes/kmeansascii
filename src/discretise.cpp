@@ -11,7 +11,7 @@
 namespace image_processor {
 
 namespace {
-  constexpr double yWeight{1.15}, cWeight{1.0};
+  constexpr double yWeight{0.5}, cWeight{1.0};
   constexpr double tol{0.01}; // maximum weighted squared movement
   constexpr std::size_t maxIter{50};
 }
