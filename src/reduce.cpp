@@ -10,11 +10,6 @@
 namespace image_processor {
 
 namespace {
-//  constexpr std::array<int, 18> hs {
-//      7, 9, 10, 11, 13, 15, 17, 19, 30,
-//      32, 34, 36, 38, 45, 47, 51, 68, 83,
-//  };
-
   constexpr int widthForHeight(int height) {
     constexpr int fh{2320}, fw{1229};
     return (height * fw + fh / 2) / fh;
@@ -23,17 +18,10 @@ namespace {
 
 Image reduce(const Image& fullImage, int gHeight) {
   int gWidth;
-//  if (std::find(hs.begin(), hs.end(), gHeight) != hs.end()) {
-//    gWidth = widthForHeight(gHeight);
-//  } else {
-//    throw std::out_of_range("Unsupported glyph height value");
-//  }
-
-  if (gHeight > 6) {
-    gWidth = widthForHeight(gHeight);
-  } else {
+  if (gHeight <= 6)
     throw std::out_of_range("Glyph height too small for accurate image");
-  }
+
+  gWidth = widthForHeight(gHeight);
 
   std::size_t imageWidth{fullImage.width()};
   std::size_t imageHeight{fullImage.height()};

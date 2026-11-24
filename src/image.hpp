@@ -15,15 +15,21 @@ inline unsigned char d2uc(double d) {
   return static_cast<unsigned char>(std::round(std::clamp(d, 0.0, 255.0)));
 }
 
+struct RGBColour {
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+}; // RGBColour
+
 struct Colour {
   unsigned char y;
   unsigned char cb;
   unsigned char cr;
 
-  Colour toRgb() const {
+  RGBColour toRgb() const {
     const double tcb = static_cast<double>(cb) - 128.0;
     const double tcr = static_cast<double>(cr) - 128.0;
-    return Colour{
+    return RGBColour{
       d2uc(y + 1.402 * tcr),
       d2uc(y - 0.344136 * tcb - 0.714136 * tcr),
       d2uc(y + 1.772 * tcb)

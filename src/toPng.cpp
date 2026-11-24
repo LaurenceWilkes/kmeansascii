@@ -11,13 +11,14 @@
 
 namespace image_processor {
 
-void writePng(const Image& image, const std::filesystem::path& outputFile) {
+void writePng(const Image& image,
+              const std::filesystem::path& outputFile) {
   std::vector<unsigned char> rgb(image.size() * 3);
   for (std::size_t i = 0; i < image.size(); ++i) {
-    const Colour colour = image.colourAt(i).toRgb();
-    rgb[3 * i] = colour.y;
-    rgb[3 * i + 1] = colour.cb;
-    rgb[3 * i + 2] = colour.cr;
+    const RGBColour colour = image.colourAt(i).toRgb();
+    rgb[3 * i] = colour.r;
+    rgb[3 * i + 1] = colour.g;
+    rgb[3 * i + 2] = colour.b;
   }
 
   const std::string filename = outputFile.string();
