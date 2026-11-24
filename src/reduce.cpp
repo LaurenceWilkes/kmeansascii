@@ -19,7 +19,7 @@ namespace {
 Image reduce(const Image& fullImage, int gHeight) {
   int gWidth;
   if (gHeight <= 6)
-    throw std::out_of_range("Glyph height too small for accurate image");
+    throw std::out_of_range("Height too small for accurate aspect");
 
   gWidth = widthForHeight(gHeight);
 
