@@ -64,6 +64,7 @@ void writeHtml(const Image& image,
   Colour background{0, 128, 128};
   if (!blackBackground)
     background = image.averageColour(0, image.width(), 0, image.height());
+  background.y = static_cast<unsigned char>(background.y * 0.25);
 
   const double fontSizeFromWidth =
     100.0 / (glyphAdvanceEm * static_cast<double>(image.width()));
