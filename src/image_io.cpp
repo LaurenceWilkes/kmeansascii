@@ -22,7 +22,8 @@ Image loadImage(const char* fileName) {
   };
 
   if (!raw) {
-      throw std::runtime_error(std::format("Failed to load image: {}", stbi_failure_reason()));
+      throw std::runtime_error(std::format("Failed to load image: {}",
+                                           stbi_failure_reason()));
   }
 
   return Image(
